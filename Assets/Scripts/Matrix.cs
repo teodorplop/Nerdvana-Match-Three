@@ -7,6 +7,7 @@ using UnityEngine;
 public class Matrix : MonoBehaviour
 {
 	private MatrixSpawner m_MatrixSpawner;
+	private Score m_Score;
 
 	private Cell[,] m_Cells;
 	private Cell m_SelectedCell;
@@ -17,6 +18,7 @@ public class Matrix : MonoBehaviour
 	private void Awake()
 	{
 		m_MatrixSpawner = GetComponent<MatrixSpawner>();
+		m_Score = FindObjectOfType<Score>();
 	}
 
 	/// <summary>
@@ -62,6 +64,7 @@ public class Matrix : MonoBehaviour
 			
 			// TODO:
 			// Since we swapped, we might have to delete those cells and bring in new ones from the top
+			m_Score.Increase();
 		}
 	}
 
