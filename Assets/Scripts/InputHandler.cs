@@ -1,35 +1,54 @@
 using UnityEngine;
 
+/// <summary>
+/// Handles user input
+/// </summary>
 public class InputHandler : MonoBehaviour
 {
-    private Camera m_Camera;
-    private Matrix m_Matrix;
+	private Camera m_Camera;
+	private Matrix m_Matrix;
 
-    private void Awake()
-    {
-        m_Camera = Camera.main;
-        m_Matrix = FindObjectOfType<Matrix>();
-    }
+	/// <summary>
+	/// In awake, we get our dependencies: camera and matrix
+	/// </summary>
+	private void Awake()
+	{
+		m_Camera = Camera.main;
+		m_Matrix = FindObjectOfType<Matrix>();
+	}
 
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            HandleMouseDown(Input.mousePosition);
-        }
-    }
+	/// <summary>
+	/// Update method, called every frame
+	/// </summary>
+	private void Update()
+	{
+		// If the first button of the mouse was clicked this frame
+		if (Input.GetMouseButtonDown(0))
+		{
+			// We get the mouse position and we handle the click
+			HandleMouseDown(Input.mousePosition);
+		}
+	}
 
-    private void HandleMouseDown(Vector2 mousePosition)
-    {
-        Vector2 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero);
-        Cell cellClicked = null;
+	/// <summary>
+	/// Represents a single cell
+	/// </summary>
+	private void HandleMouseDown(Vector2 mousePosition)
+	{
+		// Transforms mouse position to world position
+		Vector2 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
+		// Sends a ray at the world position
+		RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero);
+		
+		Cell cellClicked = null;
+		
+		if (hit.collider)
+		{
+			// If the ray hit something, we get the Cell component of what we hit
+			cellClicked = hit.collider.GetComponent<Cell>();
+		}
 
-        if (hit.collider)
-        {
-            cellClicked = hit.collider.GetComponent<Cell>();
-        }
-
-        m_Matrix.HandleCellClicked(cellClicked);
-    }
+		// We tell the matrix that a certain cell was clicked
+		m_Matrix.HandleCellClicked(cellClicked);
+	}
 }
