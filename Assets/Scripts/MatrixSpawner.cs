@@ -12,12 +12,12 @@ public class MatrixSpawner : MonoBehaviour
 	[SerializeField] private float m_Offset;
 
 	private CellSpawner m_CellSpawner;
-	private Vector2 m_StartPosition;
+	private Vector2 m_BottomLeftPosition;
 
 	private void Awake()
 	{
 		m_CellSpawner = GetComponent<CellSpawner>();
-		m_StartPosition = ComputeStartPosition(m_NoRows, m_NoColumns);
+		m_BottomLeftPosition = ComputeBottomLeftPosition(m_NoRows, m_NoColumns);
 	}
 
 	/// <summary>
@@ -52,13 +52,13 @@ public class MatrixSpawner : MonoBehaviour
 	public Vector2 ComputePosition(int row, int column)
 	{
 		// Quick maths
-		return m_StartPosition + new Vector2(column * (m_CellSize + m_Offset), row * (m_CellSize + m_Offset));
+		return m_BottomLeftPosition + new Vector2(column * (m_CellSize + m_Offset), row * (m_CellSize + m_Offset));
 	}
 
 	/// <summary>
 	/// Computes the bottom left position of a cell in the matrix
 	/// </summary>	
-	private Vector2 ComputeStartPosition(int noRows, int noColumns)
+	private Vector2 ComputeBottomLeftPosition(int noRows, int noColumns)
 	{
 		return new Vector2(-ComputeStartPosition(noColumns), -ComputeStartPosition(noRows));
 	}
