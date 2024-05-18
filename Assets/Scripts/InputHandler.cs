@@ -5,7 +5,14 @@ using UnityEngine;
 /// </summary>
 public class InputHandler : MonoBehaviour
 {
+	/// <summary>
+	/// Reference to the camera, used to transform from screen point to world point
+	/// </summary>
 	private Camera m_Camera;
+	
+	/// <summary>
+	/// Reference to the matrix, so we can let the matrix know when a cell was clicked
+	/// </summary>
 	private Matrix m_Matrix;
 
 	/// <summary>

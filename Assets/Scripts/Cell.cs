@@ -5,7 +5,16 @@ using UnityEngine;
 /// </summary>
 public class Cell : MonoBehaviour
 {
+	/// <summary>
+	/// What type does this cell have? <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private string m_Type;
+	
+	/// <summary>
+	/// Reference to the object that represents the highlight of the cell <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private GameObject m_Highlight;
 
 	private int m_Row;

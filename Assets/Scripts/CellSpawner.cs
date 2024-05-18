@@ -7,6 +7,7 @@ public class CellSpawner : MonoBehaviour
 {
 	/// <summary>
 	/// Array of all the prefabs we can spawn
+	/// SerializeField - modifiable from the inspector
 	/// </summary>
 	[SerializeField] private Cell[] m_CellPrefabs;
 	

@@ -6,7 +6,16 @@ using UnityEngine;
 /// </summary>
 public class Score : MonoBehaviour
 {
+	/// <summary>
+	/// The number of points the score starts with <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private int m_StartingScore;
+	
+	/// <summary>
+	/// The number of points added every time there's a match <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private int m_IncreaseAmount;
 	
 	private TMP_Text m_TextComponent;

@@ -6,10 +6,24 @@ using UnityEngine;
 [RequireComponent(typeof(MatrixSpawner))]
 public class Matrix : MonoBehaviour
 {
+	/// <summary>
+	/// Reference to the matrix spawner. We'll use it to spawn cells in a matrix formation.
+	/// </summary>
 	private MatrixSpawner m_MatrixSpawner;
+	
+	/// <summary>
+	/// Reference to the score object. We'll use it to update the score
+	/// </summary>
 	private Score m_Score;
 
+	/// <summary>
+	/// Matrix of cells
+	/// </summary>
 	private Cell[,] m_Cells;
+	
+	/// <summary>
+	/// Currently selected cell
+	/// </summary>
 	private Cell m_SelectedCell;
 
 	/// <summary>
@@ -22,13 +36,16 @@ public class Matrix : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Awake method, called before Start
+	/// Start method
 	/// </summary>
 	private void Start()
 	{
 		SpawnMatrix();
 	}
 
+	/// <summary>
+	/// Method that spawns the entire matrix
+	/// </summary>
 	private void SpawnMatrix()
 	{
 		m_Cells = m_MatrixSpawner.SpawnRandomMatrix();

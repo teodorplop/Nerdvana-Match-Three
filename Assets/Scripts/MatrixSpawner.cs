@@ -6,12 +6,38 @@ using UnityEngine;
 [RequireComponent(typeof(CellSpawner))]
 public class MatrixSpawner : MonoBehaviour
 {
+	/// <summary>
+	/// Number of rows to spawn <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private int m_NoRows;
+	
+	/// <summary>
+	/// Number of columns to spawn <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private int m_NoColumns;
+	
+	/// <summary>
+	/// Size of a cell <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private float m_CellSize;
+	
+	/// <summary>
+	/// Offset between cells <br/>
+	/// SerializeField - modifiable from the inspector
+	/// </summary>
 	[SerializeField] private float m_Offset;
 
+	/// <summary>
+	/// Reference to the object used to spawn a single cell
+	/// </summary>
 	private CellSpawner m_CellSpawner;
+	
+	/// <summary>
+	/// Position of the bottom left cell, computed in the Awake method
+	/// </summary>
 	private Vector2 m_BottomLeftPosition;
 
 	private void Awake()
