@@ -7,10 +7,13 @@ using UnityEngine;
 [RequireComponent(typeof(MatrixSpawner))]
 public class Matrix : MonoBehaviour
 {
-	/// <summary>
-	/// Reference to the matrix spawner. We'll use it to spawn cells in a matrix formation.
-	/// </summary>
-	private MatrixSpawner m_MatrixSpawner;
+    [SerializeField] private int m_MatchCount = 3;
+    [SerializeField] private float m_AnimationDuration = 0.5f;
+
+    /// <summary>
+    /// Reference to the matrix spawner. We'll use it to spawn cells in a matrix formation.
+    /// </summary>
+    private MatrixSpawner m_MatrixSpawner;
 	
 	/// <summary>
 	/// Reference to the score object. We'll use it to update the score
