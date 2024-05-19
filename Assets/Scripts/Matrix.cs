@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -26,6 +27,8 @@ public class Matrix : MonoBehaviour
 	/// </summary>
 	private Cell m_SelectedCell;
 
+	private int m_AnimationsRunning;
+
 	/// <summary>
 	/// Awake method, called before Start
 	/// </summary>
@@ -41,11 +44,12 @@ public class Matrix : MonoBehaviour
 	private void Start()
 	{
 		SpawnMatrix();
+
+		// At the start of the game, we check for any matches and run their animations
+		StartCoroutine(RunMatchThreeAnimation());
 	}
 
-	/// <summary>
 	/// Method that spawns the entire matrix
-	/// </summary>
 	private void SpawnMatrix()
 	{
 		m_Cells = m_MatrixSpawner.SpawnRandomMatrix();
@@ -56,6 +60,10 @@ public class Matrix : MonoBehaviour
 	/// </summary>
 	public void HandleCellClicked(Cell cell)
 	{
+		if (m_AnimationsRunning > 0)
+			// If there is an animation running, don't handle any clicks
+			return;
+
 		if (cell == null)
 		{
 			// If no cell was clicked, we deselect the currently selected one
@@ -63,7 +71,7 @@ public class Matrix : MonoBehaviour
 			return;
 		}
 
-		if (m_SelectedCell == null || !CanSwap(m_SelectedCell, cell))
+		if (m_SelectedCell == null || !AreNeighbours(m_SelectedCell, cell))
 		{
 			// If we don't have a selected cell
 			// OR
@@ -74,24 +82,100 @@ public class Matrix : MonoBehaviour
 		}
 		else
 		{
-			// We swap the cells
-			SwapCells(m_SelectedCell, cell);
-			// And deselect
-			SelectCell(null);
-			
-			// TODO:
-			// Since we swapped, we might have to delete those cells and bring in new ones from the top
-			m_Score.Increase();
+			// We start animations to swap & match
+			StartCoroutine(SwapCellsAnimation(cell));
 		}
 	}
 
-	/// <summary>
-	/// Can we swap these two cells?
-	/// </summary>	
-	private bool CanSwap(Cell cell1, Cell cell2)
+	private IEnumerator SwapCellsAnimation(Cell cell)
 	{
-		return AreNeighbours(cell1, cell2) && CheckMatchThree(cell1, cell2);
-	}
+		// Mark that we have an animation running
+		m_AnimationsRunning++;
+
+		// Swap cells
+        SwapCells(m_SelectedCell, cell);
+
+		// Wait some time
+        yield return new WaitForSeconds(m_AnimationDuration);
+
+        if (CheckMatchThree())
+        {
+			// If there's a match, run all animations
+            yield return StartCoroutine(RunMatchThreeAnimation());
+        }
+        else
+        {
+            // Swap cells back
+            SwapCells(m_SelectedCell, cell);
+			// Deselect cell
+            SelectCell(null);
+			// Wait some time
+            yield return new WaitForSeconds(m_AnimationDuration);
+        }
+
+		// Mark that we finished the animation
+		m_AnimationsRunning--;
+    }
+
+	private IEnumerator RunMatchThreeAnimation()
+	{
+        // Mark that we have an animation running
+        ++m_AnimationsRunning;
+
+        // If we still have a match
+        while (CheckMatchThree())
+        {
+			// Wait a bit
+            yield return new WaitForSeconds(m_AnimationDuration);
+
+			// Destroy all cells marked for destruction
+            for (int i = 0; i < m_Cells.GetLength(0); ++i)
+                for (int j = 0; j < m_Cells.GetLength(1); ++j)
+                    m_Cells[i, j].Destroy(m_AnimationDuration);
+
+			// Wait a bit
+            yield return new WaitForSeconds(m_AnimationDuration);
+
+            int i1;
+            for (int j = 0; j < m_Cells.GetLength(1); ++j)
+            {
+				// For each column
+				// Bring cells down
+                i1 = 0;
+                for (int i = 0; i < m_Cells.GetLength(0); ++i)
+                    if (m_Cells[i, j] != null)
+                    {
+                        if (i != i1)
+                        {
+                            m_Cells[i1, j] = m_Cells[i, j];
+                            m_Cells[i, j] = null;
+
+							m_Cells[i1, j].MoveTo(m_MatrixSpawner.ComputePosition(i1, j), m_AnimationDuration);
+                            m_Cells[i1, j].SetMatrixPosition(i1, j);
+                        }
+                        i1++;
+                    }
+            }
+
+			// Wait a bit
+            yield return new WaitForSeconds(m_AnimationDuration);
+
+			// Spawn all cells that have been destroyed
+            for (int i = 0; i < m_Cells.GetLength(0); ++i)
+                for (int j = 0; j < m_Cells.GetLength(1); ++j)
+                    if (m_Cells[i, j] == null)
+                        m_Cells[i, j] = m_MatrixSpawner.SpawnRandomCell(i, j);
+
+			// Wait a bit
+			yield return new WaitForSeconds(m_AnimationDuration);
+
+            // Increase score
+            m_Score.Increase();
+        }
+
+        // Mark that we finished the animation
+        --m_AnimationsRunning;
+    }
 
 	/// <summary>
 	/// Are the given cells neighbours?
@@ -101,12 +185,50 @@ public class Matrix : MonoBehaviour
 		return Mathf.Abs(cell1.Row - cell2.Row) + Mathf.Abs(cell1.Column - cell2.Column) == 1;
 	}
 
-	private bool CheckMatchThree(Cell cell1, Cell cell2)
+	/// <summary>
+	/// Checks for matches and marks for destruction all cells that are part of a match
+	/// </summary>
+	private bool CheckMatchThree()
 	{
-		// TODO: 
-		// We received neighbouring cell1 and cell2, which we are about to swap
-		// We should only swap if the operation actually makes a three match
-		return true;
+		bool hasMatch = false;
+
+		for (int i = 0; i < m_Cells.GetLength(0); ++i)
+			for (int j = 0; j < m_Cells.GetLength(1); ++j)
+			{
+				// Check up
+				int k = i;
+				while (k < m_Cells.GetLength(0) && m_Cells[k, j].Type == m_Cells[i, j].Type)
+					++k;
+				if (k - i >= m_MatchCount)
+				{
+					hasMatch = true;
+
+					--k;
+                    while (k >= i)
+					{
+						m_Cells[k, j].MarkForDestruction();
+						--k;
+					}
+				}
+
+				// Check right
+				k = j;
+				while (k < m_Cells.GetLength(1) && m_Cells[i, k].Type == m_Cells[i, j].Type)
+					++k;
+				if (k - j >= m_MatchCount)
+				{
+					hasMatch = true;
+
+					--k;
+                    while (k >= j)
+                    {
+                        m_Cells[i, k].MarkForDestruction();
+                        --k;
+                    }
+                }
+			}
+
+		return hasMatch;
 	}
 
 	/// <summary>
@@ -119,8 +241,8 @@ public class Matrix : MonoBehaviour
 		m_Cells[cell2.Row, cell2.Column] = cell1;
 
 		// Swap world positions
-		cell1.transform.localPosition = m_MatrixSpawner.ComputePosition(cell2.Row, cell2.Column);
-		cell2.transform.localPosition = m_MatrixSpawner.ComputePosition(cell1.Row, cell1.Column);
+		cell1.MoveTo(m_MatrixSpawner.ComputePosition(cell2.Row, cell2.Column), m_AnimationDuration);
+        cell2.MoveTo(m_MatrixSpawner.ComputePosition(cell1.Row, cell1.Column), m_AnimationDuration);
 		
 		// Swap cell component matrix positions
 		int cell1Row, cell1Column;

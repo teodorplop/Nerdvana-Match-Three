@@ -20,6 +20,8 @@ public class Cell : MonoBehaviour
 	private int m_Row;
 	private int m_Column;
 
+	private bool m_MarkedForDestruction;
+
 	/// <summary>
 	/// What type does this cell have?
 	/// </summary>
@@ -55,4 +57,33 @@ public class Cell : MonoBehaviour
 			m_Highlight.SetActive(isHighlighted);
 		}
 	}
+
+	/// <summary>
+	/// Marks the object for destruction
+	/// </summary>
+	public void MarkForDestruction()
+	{
+		m_MarkedForDestruction = true;
+    }
+
+	/// <summary>
+	/// Only if the object has been marked for destruction! <br/>
+	/// Fade out the object, and destroy it after a duration
+	/// </summary>
+    public void Destroy(float duration)
+    {
+        if (m_MarkedForDestruction)
+		{
+			GetComponent<FadeOut>().PlayFadeOut(duration);
+			Destroy(gameObject, duration);
+		}
+    }
+
+	/// <summary>
+	/// Moves the object to a position, in duration seconds
+	/// </summary>
+	public void MoveTo(Vector3 position, float duration)
+	{
+        GetComponent<Move>().PlayMove(position, duration);
+    }
 }
