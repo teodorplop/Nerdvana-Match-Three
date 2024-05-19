@@ -7,7 +7,14 @@ using UnityEngine;
 [RequireComponent(typeof(MatrixSpawner))]
 public class Matrix : MonoBehaviour
 {
+	/// <summary>
+	/// How many cells need to be in line for a match
+	/// </summary>
     [SerializeField] private int m_MatchCount = 3;
+
+	/// <summary>
+	/// Duration of an animation, in seconds
+	/// </summary>
     [SerializeField] private float m_AnimationDuration = 0.5f;
 
     /// <summary>
@@ -52,7 +59,9 @@ public class Matrix : MonoBehaviour
 		StartCoroutine(RunMatchThreeAnimation());
 	}
 
+	/// <summary>
 	/// Method that spawns the entire matrix
+	/// </summary>
 	private void SpawnMatrix()
 	{
 		m_Cells = m_MatrixSpawner.SpawnRandomMatrix();
@@ -90,6 +99,9 @@ public class Matrix : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Swap m_SelectedCell with cell
+	/// </summary>
 	private IEnumerator SwapCellsAnimation(Cell cell)
 	{
 		// Mark that we have an animation running
@@ -120,6 +132,9 @@ public class Matrix : MonoBehaviour
 		m_AnimationsRunning--;
     }
 
+	/// <summary>
+	/// Run all match animations, sequencially
+	/// </summary>
 	private IEnumerator RunMatchThreeAnimation()
 	{
         // Mark that we have an animation running
